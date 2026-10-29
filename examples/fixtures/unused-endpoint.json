@@ -1,0 +1,18 @@
+{
+  "instances": [
+    {
+      "InstanceId": "i-0noro1e000000001a",
+      "State": { "Name": "running" },
+      "MetadataOptions": {
+        "State": "applied",
+        "HttpTokens": "required",
+        "HttpEndpoint": "enabled",
+        "HttpPutResponseHopLimit": 1
+      },
+      "Tags": [{ "Key": "Name", "Value": "bastion" }]
+    }
+  ],
+  "launch_templates": [],
+  "launch_template_versions": {},
+  "launch_configurations": []
+}

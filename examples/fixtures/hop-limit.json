@@ -1,0 +1,21 @@
+{
+  "instances": [
+    {
+      "InstanceId": "i-0hop00000000000001",
+      "State": { "Name": "running" },
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::111122223333:instance-profile/node"
+      },
+      "MetadataOptions": {
+        "State": "applied",
+        "HttpTokens": "required",
+        "HttpEndpoint": "enabled",
+        "HttpPutResponseHopLimit": 3
+      },
+      "Tags": [{ "Key": "Name", "Value": "ecs-node-01" }]
+    }
+  ],
+  "launch_templates": [],
+  "launch_template_versions": {},
+  "launch_configurations": []
+}

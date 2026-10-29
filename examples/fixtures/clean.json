@@ -1,0 +1,48 @@
+{
+  "instances": [
+    {
+      "InstanceId": "i-0a1b2c3d4e5f60001",
+      "State": { "Name": "running" },
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::111122223333:instance-profile/app-runtime"
+      },
+      "MetadataOptions": {
+        "State": "applied",
+        "HttpTokens": "required",
+        "HttpEndpoint": "enabled",
+        "HttpPutResponseHopLimit": 1
+      },
+      "Tags": [
+        { "Key": "Name", "Value": "app-01" },
+        { "Key": "aws:ec2launchtemplate:id", "Value": "lt-0hardened00000001" },
+        { "Key": "aws:ec2launchtemplate:version", "Value": "4" }
+      ]
+    }
+  ],
+  "launch_templates": [
+    {
+      "LaunchTemplateId": "lt-0hardened00000001",
+      "LaunchTemplateName": "app-hardened",
+      "DefaultVersionNumber": 4,
+      "LatestVersionNumber": 4
+    }
+  ],
+  "launch_template_versions": {
+    "lt-0hardened00000001": [
+      {
+        "LaunchTemplateId": "lt-0hardened00000001",
+        "LaunchTemplateName": "app-hardened",
+        "VersionNumber": 4,
+        "DefaultVersion": true,
+        "LaunchTemplateData": {
+          "MetadataOptions": {
+            "HttpTokens": "required",
+            "HttpEndpoint": "enabled",
+            "HttpPutResponseHopLimit": 1
+          }
+        }
+      }
+    ]
+  },
+  "launch_configurations": []
+}

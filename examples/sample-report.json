@@ -1,0 +1,88 @@
+{
+  "scanned": {
+    "regions": [
+      "eu-central-1"
+    ],
+    "instances": 4,
+    "launch_template_versions": 3,
+    "launch_configurations": 1
+  },
+  "summary": {
+    "high": 4,
+    "medium": 2,
+    "low": 1
+  },
+  "findings": [
+    {
+      "rule": "IMDSV1_ENABLED",
+      "severity": "high",
+      "region": "eu-central-1",
+      "resource_type": "instance",
+      "resource_id": "i-0dead0beef0000001",
+      "detail": "HttpTokens=optional: answers unauthenticated IMDSv1 GETs, so one SSRF reads the instance role credentials (state running, member of ASG legacy-workers)",
+      "remediation": "aws ec2 modify-instance-metadata-options --region eu-central-1 --instance-id i-0dead0beef0000001 --http-tokens required --http-endpoint enabled",
+      "resource_name": "legacy-worker-01 / legacy-workers"
+    },
+    {
+      "rule": "IMDSV1_ENABLED",
+      "severity": "high",
+      "region": "eu-central-1",
+      "resource_type": "instance",
+      "resource_id": "i-0template000000001",
+      "detail": "HttpTokens=optional: answers unauthenticated IMDSv1 GETs, so one SSRF reads the instance role credentials (state running, launched from lt-0legacy0000000001)",
+      "remediation": "aws ec2 modify-instance-metadata-options --region eu-central-1 --instance-id i-0template000000001 --http-tokens required --http-endpoint enabled",
+      "resource_name": "batch-01"
+    },
+    {
+      "rule": "TEMPLATE_IMDSV1",
+      "severity": "high",
+      "region": "eu-central-1",
+      "resource_type": "launch-configuration",
+      "resource_id": "ancient-asg-lc",
+      "detail": "no MetadataOptions block: a launch configuration is immutable, so the ASG using it keeps minting IMDSv1 instances until it moves to a launch template",
+      "remediation": "aws ec2 create-launch-template --region eu-central-1 --launch-template-name ancient-asg-lc-imdsv2 --launch-template-data '{\"MetadataOptions\":{\"HttpTokens\":\"required\",\"HttpEndpoint\":\"enabled\",\"HttpPutResponseHopLimit\":1}}'"
+    },
+    {
+      "rule": "TEMPLATE_IMDSV1",
+      "severity": "high",
+      "region": "eu-central-1",
+      "resource_type": "launch-template-version",
+      "resource_id": "lt-0legacy0000000001:2 (default)",
+      "detail": "no MetadataOptions block: every instance this version launches answers IMDSv1, so fixing the live instances alone is undone by the next scale-out (1 collected instance(s) from this template)",
+      "remediation": "aws ec2 create-launch-template-version --region eu-central-1 --launch-template-id lt-0legacy0000000001 --source-version 2 --launch-template-data '{\"MetadataOptions\":{\"HttpTokens\":\"required\",\"HttpEndpoint\":\"enabled\",\"HttpPutResponseHopLimit\":1}}'",
+      "resource_name": "batch-legacy",
+      "instance_count": 1
+    },
+    {
+      "rule": "HOP_LIMIT_TOO_HIGH",
+      "severity": "medium",
+      "region": "eu-central-1",
+      "resource_type": "instance",
+      "resource_id": "i-0template000000001",
+      "detail": "HttpPutResponseHopLimit=2: the metadata response survives an extra network hop, so containers on a bridge network can reach the node role",
+      "remediation": "aws ec2 modify-instance-metadata-options --region eu-central-1 --instance-id i-0template000000001 --http-put-response-hop-limit 1",
+      "resource_name": "batch-01"
+    },
+    {
+      "rule": "HOP_LIMIT_TOO_HIGH",
+      "severity": "medium",
+      "region": "eu-central-1",
+      "resource_type": "launch-template-version",
+      "resource_id": "lt-0legacy0000000001:3 (latest)",
+      "detail": "HttpPutResponseHopLimit=3: new instances start with the extra hop already allowed",
+      "remediation": "aws ec2 create-launch-template-version --region eu-central-1 --launch-template-id lt-0legacy0000000001 --source-version 3 --launch-template-data '{\"MetadataOptions\":{\"HttpTokens\":\"required\",\"HttpEndpoint\":\"enabled\",\"HttpPutResponseHopLimit\":1}}'",
+      "resource_name": "batch-legacy",
+      "instance_count": 1
+    },
+    {
+      "rule": "METADATA_ENDPOINT_UNUSED",
+      "severity": "low",
+      "region": "eu-central-1",
+      "resource_type": "instance",
+      "resource_id": "i-0noro1e000000001a",
+      "detail": "HttpEndpoint=enabled with no instance profile attached: nothing on the box needs IMDS, so the endpoint is pure attack surface",
+      "remediation": "aws ec2 modify-instance-metadata-options --region eu-central-1 --instance-id i-0noro1e000000001a --http-endpoint disabled",
+      "resource_name": "bastion"
+    }
+  ]
+}

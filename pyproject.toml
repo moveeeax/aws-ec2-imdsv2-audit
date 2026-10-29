@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aws-ec2-imdsv2-audit"
+version = "0.1.0"
+description = "Audit EC2 instances, launch templates and launch configurations for reachable IMDSv1"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Michael Tarassov", email = "michael@tarassov.me" }]
+keywords = ["aws", "ec2", "imdsv2", "security", "audit", "cli"]
+dependencies = ["boto3>=1.28"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[project.scripts]
+aws-ec2-imdsv2-audit = "aws_ec2_imdsv2_audit.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/moveeeax/aws-ec2-imdsv2-audit"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

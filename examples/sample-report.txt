@@ -1,0 +1,29 @@
+Scanned 4 instance(s), 3 launch template version(s), 1 launch configuration(s) in eu-central-1
+
+SEVERITY  RULE                      REGION        RESOURCE                                                 DETAIL
+--------  ------------------------  ------------  -------------------------------------------------------  ------------------------------------------------------------------------
+HIGH      IMDSV1_ENABLED            eu-central-1  i-0dead0beef0000001 (legacy-worker-01 / legacy-workers)  HttpTokens=optional: answers unauthenticated IMDSv1 GETs, so one SSRF r…
+HIGH      IMDSV1_ENABLED            eu-central-1  i-0template000000001 (batch-01)                          HttpTokens=optional: answers unauthenticated IMDSv1 GETs, so one SSRF r…
+HIGH      TEMPLATE_IMDSV1           eu-central-1  ancient-asg-lc                                           no MetadataOptions block: a launch configuration is immutable, so the A…
+HIGH      TEMPLATE_IMDSV1           eu-central-1  lt-0legacy0000000001:2 (default) (batch-legacy)          no MetadataOptions block: every instance this version launches answers …
+MEDIUM    HOP_LIMIT_TOO_HIGH        eu-central-1  i-0template000000001 (batch-01)                          HttpPutResponseHopLimit=2: the metadata response survives an extra netw…
+MEDIUM    HOP_LIMIT_TOO_HIGH        eu-central-1  lt-0legacy0000000001:3 (latest) (batch-legacy)           HttpPutResponseHopLimit=3: new instances start with the extra hop alrea…
+LOW       METADATA_ENDPOINT_UNUSED  eu-central-1  i-0noro1e000000001a (bastion)                            HttpEndpoint=enabled with no instance profile attached: nothing on the …
+
+Remediation
+  IMDSV1_ENABLED i-0dead0beef0000001
+    aws ec2 modify-instance-metadata-options --region eu-central-1 --instance-id i-0dead0beef0000001 --http-tokens required --http-endpoint enabled
+  IMDSV1_ENABLED i-0template000000001
+    aws ec2 modify-instance-metadata-options --region eu-central-1 --instance-id i-0template000000001 --http-tokens required --http-endpoint enabled
+  TEMPLATE_IMDSV1 ancient-asg-lc
+    aws ec2 create-launch-template --region eu-central-1 --launch-template-name ancient-asg-lc-imdsv2 --launch-template-data '{"MetadataOptions":{"HttpTokens":"required","HttpEndpoint":"enabled","HttpPutResponseHopLimit":1}}'
+  TEMPLATE_IMDSV1 lt-0legacy0000000001:2 (default)
+    aws ec2 create-launch-template-version --region eu-central-1 --launch-template-id lt-0legacy0000000001 --source-version 2 --launch-template-data '{"MetadataOptions":{"HttpTokens":"required","HttpEndpoint":"enabled","HttpPutResponseHopLimit":1}}'
+  HOP_LIMIT_TOO_HIGH i-0template000000001
+    aws ec2 modify-instance-metadata-options --region eu-central-1 --instance-id i-0template000000001 --http-put-response-hop-limit 1
+  HOP_LIMIT_TOO_HIGH lt-0legacy0000000001:3 (latest)
+    aws ec2 create-launch-template-version --region eu-central-1 --launch-template-id lt-0legacy0000000001 --source-version 3 --launch-template-data '{"MetadataOptions":{"HttpTokens":"required","HttpEndpoint":"enabled","HttpPutResponseHopLimit":1}}'
+  METADATA_ENDPOINT_UNUSED i-0noro1e000000001a
+    aws ec2 modify-instance-metadata-options --region eu-central-1 --instance-id i-0noro1e000000001a --http-endpoint disabled
+
+Findings: 4 high, 2 medium, 1 low

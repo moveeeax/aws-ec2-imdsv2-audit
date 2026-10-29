@@ -1,0 +1,24 @@
+{
+  "instances": [
+    {
+      "InstanceId": "i-0dead0beef0000001",
+      "State": { "Name": "running" },
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::111122223333:instance-profile/legacy-worker"
+      },
+      "MetadataOptions": {
+        "State": "applied",
+        "HttpTokens": "optional",
+        "HttpEndpoint": "enabled",
+        "HttpPutResponseHopLimit": 1
+      },
+      "Tags": [
+        { "Key": "Name", "Value": "legacy-worker-01" },
+        { "Key": "aws:autoscaling:groupName", "Value": "legacy-workers" }
+      ]
+    }
+  ],
+  "launch_templates": [],
+  "launch_template_versions": {},
+  "launch_configurations": []
+}

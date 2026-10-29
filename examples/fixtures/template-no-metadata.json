@@ -1,0 +1,58 @@
+{
+  "instances": [
+    {
+      "InstanceId": "i-0template000000001",
+      "State": { "Name": "running" },
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::111122223333:instance-profile/batch"
+      },
+      "MetadataOptions": {
+        "State": "applied",
+        "HttpTokens": "required",
+        "HttpEndpoint": "enabled",
+        "HttpPutResponseHopLimit": 1
+      },
+      "Tags": [
+        { "Key": "aws:ec2launchtemplate:id", "Value": "lt-0legacy0000000001" }
+      ]
+    },
+    {
+      "InstanceId": "i-0template000000002",
+      "State": { "Name": "running" },
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::111122223333:instance-profile/batch"
+      },
+      "MetadataOptions": {
+        "State": "applied",
+        "HttpTokens": "required",
+        "HttpEndpoint": "enabled",
+        "HttpPutResponseHopLimit": 1
+      },
+      "Tags": [
+        { "Key": "aws:ec2launchtemplate:id", "Value": "lt-0legacy0000000001" }
+      ]
+    }
+  ],
+  "launch_templates": [
+    {
+      "LaunchTemplateId": "lt-0legacy0000000001",
+      "LaunchTemplateName": "batch-legacy",
+      "DefaultVersionNumber": 2,
+      "LatestVersionNumber": 2
+    }
+  ],
+  "launch_template_versions": {
+    "lt-0legacy0000000001": [
+      {
+        "LaunchTemplateId": "lt-0legacy0000000001",
+        "LaunchTemplateName": "batch-legacy",
+        "VersionNumber": 2,
+        "DefaultVersion": true,
+        "LaunchTemplateData": {
+          "InstanceType": "m6i.large"
+        }
+      }
+    ]
+  },
+  "launch_configurations": []
+}
