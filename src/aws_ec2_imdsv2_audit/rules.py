@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Dict, Iterable, List, Optional, Sequence
+from collections.abc import Iterable, Sequence
 
 from .model import (
     SEVERITY_ORDER,
@@ -14,7 +14,7 @@ from .model import (
     TemplateVersion,
 )
 
-RULES: Dict[str, str] = {
+RULES: dict[str, str] = {
     "IMDSV1_ENABLED": "high",
     "TEMPLATE_IMDSV1": "high",
     "HOP_LIMIT_TOO_HIGH": "medium",
@@ -57,13 +57,13 @@ def _new_template_version(version: TemplateVersion) -> str:
     )
 
 
-def _instance_label(instance: Instance) -> Optional[str]:
+def _instance_label(instance: Instance) -> str | None:
     bits = [b for b in (instance.name, instance.asg_name) if b]
     return " / ".join(bits) if bits else None
 
 
-def _instance_findings(instance: Instance) -> List[Finding]:
-    findings: List[Finding] = []
+def _instance_findings(instance: Instance) -> list[Finding]:
+    findings: list[Finding] = []
     endpoint_on = instance.http_endpoint == "enabled"
 
     if endpoint_on and instance.http_tokens != "required":
@@ -140,9 +140,9 @@ def _instance_findings(instance: Instance) -> List[Finding]:
 
 def _template_findings(
     version: TemplateVersion, instance_count: int
-) -> List[Finding]:
+) -> list[Finding]:
     meta = version.metadata_options or {}
-    findings: List[Finding] = []
+    findings: list[Finding] = []
     tokens = meta.get("HttpTokens")
 
     if tokens != "required":
@@ -190,7 +190,7 @@ def _template_findings(
     return findings
 
 
-def _launch_configuration_findings(config: LaunchConfiguration) -> List[Finding]:
+def _launch_configuration_findings(config: LaunchConfiguration) -> list[Finding]:
     meta = config.metadata_options or {}
     if meta.get("HttpTokens") == "required":
         return []
@@ -217,8 +217,8 @@ def _launch_configuration_findings(config: LaunchConfiguration) -> List[Finding]
     ]
 
 
-def _instances_per_template(inventory: RegionInventory) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def _instances_per_template(inventory: RegionInventory) -> dict[str, int]:
+    counts: dict[str, int] = {}
     for instance in inventory.instances:
         if instance.template_id:
             counts[instance.template_id] = counts.get(instance.template_id, 0) + 1
@@ -227,9 +227,9 @@ def _instances_per_template(inventory: RegionInventory) -> Dict[str, int]:
 
 def evaluate(
     inventories: Iterable[RegionInventory], ignore: Sequence[str] = ()
-) -> List[Finding]:
+) -> list[Finding]:
     ignored = {rule.strip().upper() for rule in ignore if rule.strip()}
-    findings: List[Finding] = []
+    findings: list[Finding] = []
     for inventory in inventories:
         counts = _instances_per_template(inventory)
         for instance in inventory.instances:

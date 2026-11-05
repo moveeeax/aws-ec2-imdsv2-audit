@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import boto3
 import pytest
@@ -15,7 +15,7 @@ FIXTURES = Path(__file__).resolve().parents[1] / "examples" / "fixtures"
 REGION = "eu-central-1"
 
 
-def load_fixture(name: str) -> Dict[str, Any]:
+def load_fixture(name: str) -> dict[str, Any]:
     return json.loads((FIXTURES / f"{name}.json").read_text())
 
 
@@ -28,16 +28,16 @@ def _session():
     )
 
 
-def _state_values(include_stopped: bool) -> List[str]:
+def _state_values(include_stopped: bool) -> list[str]:
     return ["running", "stopped", "stopping"] if include_stopped else ["running"]
 
 
 @contextmanager
 def stubbed_clients(
-    data: Dict[str, Any],
+    data: dict[str, Any],
     region: str = REGION,
     include_stopped: bool = False,
-    error: Optional[Dict[str, str]] = None,
+    error: dict[str, str] | None = None,
 ):
     """Queue exactly the calls collect_region() makes, in order."""
     session = _session()
@@ -90,7 +90,7 @@ def stubbed_clients(
         yield ec2, autoscaling
 
 
-def run_cli(argv, fixture_name: str, error: Optional[Dict[str, str]] = None):
+def run_cli(argv, fixture_name: str, error: dict[str, str] | None = None):
     """Run the CLI end to end against a fixture; returns (exit_code, stdout_capture)."""
     from aws_ec2_imdsv2_audit.cli import main
 

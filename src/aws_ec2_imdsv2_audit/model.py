@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 SEVERITY_ORDER = {"low": 1, "medium": 2, "high": 3}
 SEVERITIES = ("high", "medium", "low")
@@ -16,13 +16,13 @@ class Instance:
     state: str
     http_tokens: str
     http_endpoint: str
-    hop_limit: Optional[int]
+    hop_limit: int | None
     metadata_state: str
     has_role: bool
-    name: Optional[str] = None
-    template_id: Optional[str] = None
-    template_version: Optional[str] = None
-    asg_name: Optional[str] = None
+    name: str | None = None
+    template_id: str | None = None
+    template_version: str | None = None
+    asg_name: str | None = None
 
 
 @dataclass
@@ -31,8 +31,8 @@ class TemplateVersion:
     template_id: str
     template_name: str
     version: int
-    labels: List[str] = field(default_factory=list)
-    metadata_options: Optional[Dict[str, Any]] = None
+    labels: list[str] = field(default_factory=list)
+    metadata_options: dict[str, Any] | None = None
 
     @property
     def label(self) -> str:
@@ -45,15 +45,15 @@ class TemplateVersion:
 class LaunchConfiguration:
     region: str
     name: str
-    metadata_options: Optional[Dict[str, Any]] = None
+    metadata_options: dict[str, Any] | None = None
 
 
 @dataclass
 class RegionInventory:
     region: str
-    instances: List[Instance] = field(default_factory=list)
-    template_versions: List[TemplateVersion] = field(default_factory=list)
-    launch_configurations: List[LaunchConfiguration] = field(default_factory=list)
+    instances: list[Instance] = field(default_factory=list)
+    template_versions: list[TemplateVersion] = field(default_factory=list)
+    launch_configurations: list[LaunchConfiguration] = field(default_factory=list)
 
 
 @dataclass
@@ -65,11 +65,11 @@ class Finding:
     resource_id: str
     detail: str
     remediation: str
-    resource_name: Optional[str] = None
-    instance_count: Optional[int] = None
+    resource_name: str | None = None
+    instance_count: int | None = None
 
-    def as_dict(self) -> Dict[str, Any]:
-        out: Dict[str, Any] = {
+    def as_dict(self) -> dict[str, Any]:
+        out: dict[str, Any] = {
             "rule": self.rule,
             "severity": self.severity,
             "region": self.region,

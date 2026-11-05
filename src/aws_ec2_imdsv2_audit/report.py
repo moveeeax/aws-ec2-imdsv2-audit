@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import io
 import json
-from typing import Dict, List, Sequence
+from collections.abc import Sequence
 
 from .model import SEVERITIES, Finding, RegionInventory
 
@@ -23,14 +23,14 @@ CSV_COLUMNS = (
 )
 
 
-def counts_by_severity(findings: Sequence[Finding]) -> Dict[str, int]:
+def counts_by_severity(findings: Sequence[Finding]) -> dict[str, int]:
     counts = {severity: 0 for severity in SEVERITIES}
     for finding in findings:
         counts[finding.severity] += 1
     return counts
 
 
-def scanned_summary(inventories: Sequence[RegionInventory]) -> Dict[str, object]:
+def scanned_summary(inventories: Sequence[RegionInventory]) -> dict[str, object]:
     return {
         "regions": [inv.region for inv in inventories],
         "instances": sum(len(inv.instances) for inv in inventories),
@@ -62,7 +62,7 @@ def render_table(
     if not findings:
         return header + "\n\nNo findings: IMDSv1 is not reachable anywhere scanned."
 
-    rows: List[Sequence[str]] = []
+    rows: list[Sequence[str]] = []
     for finding in findings:
         resource = finding.resource_id
         if finding.resource_name and finding.resource_name != finding.resource_id:
@@ -79,13 +79,13 @@ def render_table(
 
     widths = [len(col) for col in COLUMNS]
     for row in rows:
-        widths = [max(w, len(cell)) for w, cell in zip(widths, row)]
+        widths = [max(w, len(cell)) for w, cell in zip(widths, row, strict=True)]
 
     lines = [header, ""]
-    lines.append("  ".join(col.ljust(w) for col, w in zip(COLUMNS, widths)).rstrip())
+    lines.append("  ".join(col.ljust(w) for col, w in zip(COLUMNS, widths, strict=True)).rstrip())
     lines.append("  ".join("-" * w for w in widths))
     for row in rows:
-        lines.append("  ".join(cell.ljust(w) for cell, w in zip(row, widths)).rstrip())
+        lines.append("  ".join(cell.ljust(w) for cell, w in zip(row, widths, strict=True)).rstrip())
 
     lines.append("")
     lines.append("Remediation")

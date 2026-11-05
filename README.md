@@ -1,7 +1,7 @@
 # aws-ec2-imdsv2-audit
 
 [![ci](https://github.com/moveeeax/aws-ec2-imdsv2-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/moveeeax/aws-ec2-imdsv2-audit/actions/workflows/ci.yml)
-[![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
+[![python](https://img.shields.io/badge/python-3.11%20%E2%80%93%203.15-blue)](https://www.python.org/)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 Find the EC2 instances, launch templates and launch configurations in an AWS account that
@@ -120,6 +120,7 @@ python examples/demo.py --format json
 ```bash
 pip install -e '.[dev]'
 pytest -q
+ruff check .
 ```
 
 23 tests, all offline: every rule, both exit-code thresholds, `--ignore`, the three
