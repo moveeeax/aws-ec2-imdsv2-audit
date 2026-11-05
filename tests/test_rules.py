@@ -1,11 +1,11 @@
 import json
 
+from conftest import load_fixture, stubbed_clients
+
 from aws_ec2_imdsv2_audit.collect import collect_region
 from aws_ec2_imdsv2_audit.model import AwsAuditError
 from aws_ec2_imdsv2_audit.report import render_csv, render_json, render_table
 from aws_ec2_imdsv2_audit.rules import evaluate, exit_code
-
-from conftest import load_fixture, stubbed_clients
 
 REGION = "eu-central-1"
 

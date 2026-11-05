@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Optional
+from collections.abc import Iterable
+from typing import Any
 
 from botocore.exceptions import BotoCoreError, ClientError
 
@@ -22,11 +23,11 @@ RUNNING_STATES = ["running"]
 STOPPED_STATES = ["stopped", "stopping"]
 
 
-def _tags(raw: Iterable[Dict[str, str]]) -> Dict[str, str]:
+def _tags(raw: Iterable[dict[str, str]]) -> dict[str, str]:
     return {t.get("Key", ""): t.get("Value", "") for t in raw or []}
 
 
-def _instance_from_api(raw: Dict[str, Any], region: str) -> Instance:
+def _instance_from_api(raw: dict[str, Any], region: str) -> Instance:
     meta = raw.get("MetadataOptions") or {}
     tags = _tags(raw.get("Tags"))
     hop = meta.get("HttpPutResponseHopLimit")
@@ -48,11 +49,11 @@ def _instance_from_api(raw: Dict[str, Any], region: str) -> Instance:
     )
 
 
-def collect_instances(ec2, region: str, include_stopped: bool) -> List[Instance]:
+def collect_instances(ec2, region: str, include_stopped: bool) -> list[Instance]:
     states = list(RUNNING_STATES)
     if include_stopped:
         states += STOPPED_STATES
-    instances: List[Instance] = []
+    instances: list[Instance] = []
     paginator = ec2.get_paginator("describe_instances")
     pages = paginator.paginate(
         Filters=[{"Name": "instance-state-name", "Values": states}]
@@ -64,25 +65,25 @@ def collect_instances(ec2, region: str, include_stopped: bool) -> List[Instance]
     return instances
 
 
-def collect_template_versions(ec2, region: str) -> List[TemplateVersion]:
+def collect_template_versions(ec2, region: str) -> list[TemplateVersion]:
     """The $Default and $Latest version of every launch template.
 
     Those two are the ones that can still mint new instances; older versions
     are history and reporting them would only add noise.
     """
-    templates: List[Dict[str, Any]] = []
+    templates: list[dict[str, Any]] = []
     paginator = ec2.get_paginator("describe_launch_templates")
     for page in paginator.paginate():
         templates.extend(page.get("LaunchTemplates", []))
 
-    collected: List[TemplateVersion] = []
+    collected: list[TemplateVersion] = []
     for template in templates:
         template_id = template["LaunchTemplateId"]
         template_name = template.get("LaunchTemplateName", template_id)
         response = ec2.describe_launch_template_versions(
             LaunchTemplateId=template_id, Versions=["$Default", "$Latest"]
         )
-        by_version: Dict[int, TemplateVersion] = {}
+        by_version: dict[int, TemplateVersion] = {}
         for raw in response.get("LaunchTemplateVersions", []):
             number = int(raw["VersionNumber"])
             data = raw.get("LaunchTemplateData") or {}
@@ -105,8 +106,8 @@ def collect_template_versions(ec2, region: str) -> List[TemplateVersion]:
     return collected
 
 
-def collect_launch_configurations(autoscaling, region: str) -> List[LaunchConfiguration]:
-    configs: List[LaunchConfiguration] = []
+def collect_launch_configurations(autoscaling, region: str) -> list[LaunchConfiguration]:
+    configs: list[LaunchConfiguration] = []
     paginator = autoscaling.get_paginator("describe_launch_configurations")
     for page in paginator.paginate():
         for raw in page.get("LaunchConfigurations", []):
@@ -138,7 +139,7 @@ def collect_region(
         raise AwsAuditError(f"{region}: {exc}") from exc
 
 
-def resolve_region(session, explicit: Optional[List[str]]) -> List[str]:
+def resolve_region(session, explicit: list[str] | None) -> list[str]:
     if explicit:
         return list(dict.fromkeys(explicit))
     region = getattr(session, "region_name", None)

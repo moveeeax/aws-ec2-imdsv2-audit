@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import Callable, List, Optional, Sequence, Tuple
+from collections.abc import Callable, Sequence
 
 from . import __version__
 from .collect import collect_region, resolve_region
@@ -12,23 +12,23 @@ from .model import AwsAuditError, RegionInventory
 from .report import render
 from .rules import RULES, evaluate, exit_code
 
-ClientFactory = Callable[[str, Optional[str]], Tuple[object, object]]
+ClientFactory = Callable[[str, str | None], tuple[object, object]]
 
 
-def _default_clients(region: str, profile: Optional[str]):
+def _default_clients(region: str, profile: str | None):
     import boto3
 
     session = boto3.Session(profile_name=profile, region_name=region)
     return session.client("ec2"), session.client("autoscaling")
 
 
-def _default_session(profile: Optional[str]):
+def _default_session(profile: str | None):
     import boto3
 
     return boto3.Session(profile_name=profile)
 
 
-def _ignore_list(value: str) -> List[str]:
+def _ignore_list(value: str) -> list[str]:
     rules = [item.strip().upper() for item in value.split(",") if item.strip()]
     unknown = [rule for rule in rules if rule not in RULES]
     if unknown:
@@ -80,15 +80,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(
-    argv: Optional[Sequence[str]] = None,
+    argv: Sequence[str] | None = None,
     client_factory: ClientFactory = _default_clients,
-    session_factory: Callable[[Optional[str]], object] = _default_session,
+    session_factory: Callable[[str | None], object] = _default_session,
 ) -> int:
     args = build_parser().parse_args(argv)
 
     try:
         regions = resolve_region(session_factory(args.profile), args.regions)
-        inventories: List[RegionInventory] = []
+        inventories: list[RegionInventory] = []
         for region in regions:
             ec2, autoscaling = client_factory(region, args.profile)
             inventories.append(
